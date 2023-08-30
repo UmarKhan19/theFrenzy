@@ -9,7 +9,7 @@ const sendEmail = require("../utils/sendMail");
 // //////////////////////////////////////////////////////////////////
 
 const validateFields = (fields) => {
-  const requiredFields = ["email", "password", "role", "profile"];
+  const requiredFields = ["email", "password", "profile"];
   for (const field of requiredFields) {
     if (!fields[field]) {
       return field;
@@ -24,7 +24,7 @@ const validateFields = (fields) => {
 
 const registerUser = async (req, res) => {
   try {
-    const { email, password, role, profile } = req.body;
+    const { email, password, profile } = req.body;
 
     // Check if the email already exists
     const existingUser = await User.findOne({ email });
@@ -33,7 +33,7 @@ const registerUser = async (req, res) => {
     }
 
     // Validate all required fields are provided
-    const missingField = validateFields({ email, password, role, profile });
+    const missingField = validateFields({ email, password, profile });
     if (missingField) {
       return res.status(400).json({ error: `${missingField} is required` });
     }
@@ -45,7 +45,6 @@ const registerUser = async (req, res) => {
     const newUser = new User({
       email,
       password: hashedPassword, // Store hashed password
-      role,
       profile,
     });
 

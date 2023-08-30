@@ -6,6 +6,7 @@ const productRoutes = require("./routes/productRoutes");
 const bodyParser = require("body-parser");
 const fileUpload = require("express-fileupload");
 const cors = require("cors");
+const errorHandler = require("./middleware/errorHandler");
 
 dotenv.config({ path: "./config/.env" });
 
@@ -23,6 +24,8 @@ app.use(fileUpload({ useTempFiles: true }));
 // Routes
 app.use("/api/user", userRoutes);
 app.use("/api/product", productRoutes);
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
