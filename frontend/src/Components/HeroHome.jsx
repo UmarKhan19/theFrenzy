@@ -1,5 +1,5 @@
 import React from 'react';
-import HeroImg from "../../images/Hero.png";
+import HeroImg from "../../public/images/Hero.png";
 import { BsArrowRight } from "react-icons/bs";
 
 const Hero = () => {

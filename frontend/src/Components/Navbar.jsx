@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { navLinks } from '../../const/index';
+import { navLinks } from '.././const/index';
 import { AiOutlineHeart } from 'react-icons/ai';
 import { PiShoppingBag } from 'react-icons/pi';
 import { HiMenu } from 'react-icons/hi';
-import logo from '../../images/logo1.png';
+import logo from '../../public/images/logo1.png';
 // import { Link } from 'react-scroll';
 
 const Navbar = () => {

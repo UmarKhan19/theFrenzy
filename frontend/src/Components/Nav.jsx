@@ -4,7 +4,7 @@ import { navLinks } from '../const/index';
 import { AiOutlineHeart } from 'react-icons/ai';
 import { PiShoppingBag } from 'react-icons/pi';
 import { HiMenu } from 'react-icons/hi';
-import logo from '../images/footer.png';
+import logo from '../../public/images/footer.png';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
