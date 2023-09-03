@@ -1,7 +1,7 @@
-import Hero from "./Hero";
-import Navbar from "./Navbar";
+import HeroHome from "../../Components/HeroHome";
+import Navbar from "../../Components/Navbar";
 import Footer from"../../Components/Footer";
-import PopularPicks from "./PopularPicks"
+import PopularPicks from "../../Components/PopularPicks"
 
 const HomePage = () => {
   return (
@@ -11,7 +11,7 @@ const HomePage = () => {
       <Navbar/>
       </nav>
     <section>
-            <Hero/>
+            <HeroHome/>
     </section>
     </main>
     <section>

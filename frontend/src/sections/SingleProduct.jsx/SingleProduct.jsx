@@ -1,15 +1,15 @@
 import Nav from '../../Components/Nav';
-import Hero from './Hero';
-import SingleCard from "./SingleCard";
+import HeroSingle from '../../Components/HeroSingle';
+import SingleCard from "../../Components/SingleCard";
 import Footer from "../../Components/Footer";
-import Reviews from './Reviews';
+import Reviews from '../../Components/Reviews';
 
 const SingleProduct = () => {
   return (
     <main>
       <Nav/>
       <div>
-      <Hero/>
+      <HeroSingle/>
       </div>
       <div>
         <SingleCard/>
