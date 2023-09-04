@@ -1,4 +1,4 @@
-const Comment = require("../models/commentModel");
+const Comment = require("../models/reviewModel");
 const Product = require("../models/productModel");
 const cloudinary = require("cloudinary").v2;
 
