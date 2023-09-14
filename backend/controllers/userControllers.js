@@ -24,49 +24,48 @@ const validateFields = (fields) => {
 
 const registerUser = async (req, res) => {
   try {
-    const { email, password, profile } = req.body;
+    // Extract user registration data from the request body
+    const { email, password, role, firstName, lastName, address, phoneNumber } =
+      req.body;
 
-    // Check if the email already exists
+    // Check if the email is already registered
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ error: "Email already exists" });
+      return res.status(400).json({ message: "Email already registered" });
     }
 
-    // Validate all required fields are provided
-    const missingField = validateFields({ email, password, profile });
-    if (missingField) {
-      return res.status(400).json({ error: `${missingField} is required` });
-    }
+    // Hash the password before saving it to the database
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Hash the password using bcrypt
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-
+    // Create a new user instance
     const newUser = new User({
       email,
-      password: hashedPassword, // Store hashed password
-      profile,
+      password: hashedPassword,
+      role,
+      firstName,
+      lastName,
+      address,
+      phoneNumber,
     });
 
-    const savedUser = await newUser.save();
+    // Save the user to the database
+    await newUser.save();
 
-    // Generate and send JWT token upon successful user creation
     const token = jwt.sign(
-      { userId: savedUser._id, role: savedUser.role },
+      { userId: newUser._id, role: newUser.role },
       process.env.JWT_SECRET,
       {
         expiresIn: "7d", // Token expiration time (adjust as needed)
       }
     );
-
+    // Return a success message
     res
       .status(201)
       .header("Authorization", `Bearer ${token}`)
-      .json({ success: true, message: "User registered successfully" });
+      .json({ message: "User registered successfully" });
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "An error occurred while creating the user" });
+    console.error("Error during user registration:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
@@ -140,7 +139,7 @@ const getProfile = async (req, res) => {
 
 const updateUser = async (req, res) => {
   try {
-    const { name, address, phoneNumber } = req.body;
+    const { firstName, lastName, address, phoneNumber } = req.body;
 
     const user = await User.findById(req.user.id);
 
@@ -149,9 +148,10 @@ const updateUser = async (req, res) => {
     }
 
     //   Update the user profile
-    user.profile.name = name || user.profile.name;
-    user.profile.address = address || user.profile.address;
-    user.profile.phoneNumber = phoneNumber || user.profile.phoneNumber;
+    user.firstName = firstName || user.firstName;
+    user.lastName = lastName || user.lastName;
+    user.address = address || user.address;
+    user.phoneNumber = phoneNumber || user.phoneNumber;
 
     //   save the updated user profile
     await user.save();
@@ -257,7 +257,7 @@ const forgotPassword = async (req, res) => {
     await user.save();
 
     // Send a password reset email with the token
-    const resetLink = `http://your-frontend-app/reset-password/${resetToken}`;
+    const resetLink = `http://${process.env.FRONTEND_URI}/reset-password/${resetToken}`;
     const emailSubject = "Password Reset Request";
     const emailText = `You have requested a password reset. Click the following link to reset your password: ${resetLink}`;
 
