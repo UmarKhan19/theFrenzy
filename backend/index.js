@@ -3,6 +3,8 @@ const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
+const categoryRoutes = require("./routes/categoryRoutes");
+const couponRoutes = require("./routes/couponRoutes");
 const bodyParser = require("body-parser");
 const fileUpload = require("express-fileupload");
 const cors = require("cors");
@@ -24,6 +26,8 @@ app.use(fileUpload({ useTempFiles: true }));
 // Routes
 app.use("/api/user", userRoutes);
 app.use("/api/product", productRoutes);
+app.use("/api/category", categoryRoutes);
+app.use("/api/coupon", couponRoutes);
 
 app.use(errorHandler);
 

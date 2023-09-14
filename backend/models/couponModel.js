@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const couponSchema = new mongoose.Schema(
   {
     code: { type: String, required: true, trim: true, unique: true },
-    discountPercentage: { type: Number, min: 0, max: 100, default: 0 },
+    discountPercentage: { type: Number, min: 0, max: 100, required: true },
     usageLimit: { type: Number, min: 0 },
     usageCount: { type: Number, min: 0 },
     expirationDate: Date,

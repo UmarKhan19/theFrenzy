@@ -1,5 +1,6 @@
 const Comment = require("../models/reviewModel");
 const Product = require("../models/productModel");
+const Category = require("../models/categoryModel");
 const cloudinary = require("cloudinary").v2;
 
 cloudinary.config({
@@ -14,20 +15,35 @@ cloudinary.config({
 
 const createProduct = async (req, res) => {
   try {
-    const { name, description, category, originalPrice, discountPercent } =
-      req.body;
+    const { name, description, categories, price, discount } = req.body;
+
+    if (!name) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Please provide product name" });
+    }
+
+    // Use a single query to find all categories by their IDs
+    const productCategories = await Category.find({ _id: { $in: categories } });
+
+    if (!productCategories.length) {
+      return res.status(400).json({
+        success: false,
+        message: "One or more categories do not exist",
+      });
+    }
+
+    const totalPrice = price - (price * discount) / 100;
 
     const newProduct = new Product({
       name,
       description,
-      category,
-      originalPrice,
-      discountPercent,
-      comments: [],
+      category: productCategories,
+      price,
+      discount,
+      totalPrice,
+      reviews: [],
     });
-
-    const totalPrice = originalPrice - (originalPrice * discountPercent) / 100;
-    newProduct.totalPrice = totalPrice;
 
     const savedProduct = await newProduct.save();
 
@@ -37,7 +53,67 @@ const createProduct = async (req, res) => {
       id: savedProduct._id,
     });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    if (process.env.NODE_ENV !== "production") {
+      console.error(error);
+    }
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+// //////////////////////////////////////////////////////////////////
+// Add Product Variant
+// //////////////////////////////////////////////////////////////////
+
+const addVariant = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const { size, color, stock } = req.body;
+    const { images } = req.files;
+
+    // Step 1: Upload new images to Cloudinary
+    const uploadedImageUrls = await Promise.all(
+      images.map(async (url) => {
+        const uploadedImage = await cloudinary.uploader.upload(
+          url.tempFilePath
+        );
+        return uploadedImage.secure_url;
+      })
+    );
+
+    // Step 2: Find the product by ID and push the new variant
+    const updatedProduct = await Product.findOneAndUpdate(
+      { _id: productId },
+      {
+        $push: {
+          variants: {
+            size,
+            color,
+            stock,
+            images: uploadedImageUrls,
+          },
+        },
+      },
+      { new: true }
+    );
+
+    if (!updatedProduct) {
+      for (const imageUrl of uploadedImageUrls) {
+        const publicId = imageUrl.split("/").pop().split(".")[0];
+        await cloudinary.uploader.destroy(publicId);
+      }
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found" });
+    }
+
+    res.status(201).json({
+      success: true,
+      message: "Variant added successfully",
+      product: updatedProduct,
+    });
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") console.error(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
 
@@ -59,7 +135,7 @@ const deleteProduct = async (req, res) => {
 
     // Delete associated images from Cloudinary
     const deletedImageUrls = deletedProduct.variants.flatMap(
-      (variant) => variant.imageUrls
+      (variant) => variant.images
     );
 
     for (const imageUrl of deletedImageUrls) {
@@ -123,7 +199,7 @@ const getSingleProduct = async (req, res) => {
         .status(404)
         .json({ success: false, message: "No product found with id " + id });
     }
-    product.viewCount = (product.viewCount || 0) + 1;
+    product.viewCount += 1;
 
     // Save the updated product
     await product.save();
@@ -141,8 +217,7 @@ const getSingleProduct = async (req, res) => {
 
 const updateProduct = async (req, res, next) => {
   const { id } = req.params;
-  const { name, description, price, category, originalPrice, discountPercent } =
-    req.body;
+  const { name, description, price, category, discount } = req.body;
 
   try {
     const productUpdate = {
@@ -150,11 +225,10 @@ const updateProduct = async (req, res, next) => {
       name,
       price,
       category,
-      originalPrice,
-      discountPercent,
+      discount,
     };
 
-    const totalPrice = originalPrice - (originalPrice * discountPercent) / 100;
+    const totalPrice = price - (price * discount) / 100;
     productUpdate.totalPrice = totalPrice;
 
     const updatedProduct = await Product.findByIdAndUpdate(id, productUpdate, {
@@ -219,7 +293,7 @@ const updateVariant = async (req, res) => {
 
     // Step 4: Update the product with new image URLs
     const imageUpdate = {
-      "variants.$.imageUrls": uploadedImageUrls,
+      "variants.$.images": uploadedImageUrls,
     };
     await Product.findOneAndUpdate(
       { _id: productId, "variants._id": variantId },
@@ -258,59 +332,6 @@ const updateVariant = async (req, res) => {
 };
 
 // //////////////////////////////////////////////////////////////////
-// Add Product Variant
-// //////////////////////////////////////////////////////////////////
-
-const addVariant = async (req, res) => {
-  try {
-    const { productId } = req.params;
-    const { size, color, stock } = req.body;
-    const { images } = req.files;
-
-    // Step 1: Upload new images to Cloudinary
-    const uploadedImageUrls = await Promise.all(
-      images.map(async (url) => {
-        const uploadedImage = await cloudinary.uploader.upload(
-          url.tempFilePath
-        );
-        return uploadedImage.secure_url;
-      })
-    );
-
-    // Step 2: Find the product by ID and push the new variant
-    const updatedProduct = await Product.findOneAndUpdate(
-      { _id: productId },
-      {
-        $push: {
-          variants: {
-            size,
-            color,
-            stock,
-            imageUrls: uploadedImageUrls,
-          },
-        },
-      },
-      { new: true }
-    );
-
-    if (!updatedProduct) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Product not found" });
-    }
-
-    res.status(201).json({
-      success: true,
-      message: "Variant added successfully",
-      product: updatedProduct,
-    });
-  } catch (error) {
-    if (process.env.NODE_ENV !== "production") console.error(error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
-  }
-};
-
-// //////////////////////////////////////////////////////////////////
 // Delete Product Variant
 // //////////////////////////////////////////////////////////////////
 
@@ -334,7 +355,7 @@ const deleteVariant = async (req, res) => {
 
     // Delete images from Cloudinary
     try {
-      for (const imageUrl of variantToDelete.imageUrls) {
+      for (const imageUrl of variantToDelete.images) {
         const publicId = imageUrl.split("/").pop().split(".")[0];
         await cloudinary.uploader.destroy(publicId);
       }
@@ -466,17 +487,30 @@ const addReview = async (req, res) => {
     const { comment, rating } = req.body;
     const userId = req.user.id; // Extracted from authentication middleware
 
-    if (!comment || !rating) {
+    if (!rating) {
       return res.status(400).json({
         success: false,
-        message: "Please provide both a comment and a rating",
+        message: "Please provide a rating",
       });
     }
 
     if (rating > 5 || rating < 0) {
       return res
         .status(400)
-        .json({ success: false, message: "rating must be between 0 and 5" });
+        .json({ success: false, message: "Rating must be between 0 and 5" });
+    }
+
+    // Check if the user has already reviewed the product
+    const existingReview = await Comment.findOne({
+      user: userId,
+      product: productId,
+    });
+
+    if (existingReview) {
+      return res.status(409).json({
+        success: false,
+        message: "You have already reviewed this product",
+      });
     }
 
     // Find the product
@@ -493,26 +527,20 @@ const addReview = async (req, res) => {
       comment,
       rating: parseInt(rating),
       user: userId,
+      product: productId,
     });
 
     // Save the comment
     await newComment.save();
 
-    // Update the product's comments array with the new comment's ID
-    product.comments.push(newComment);
+    // Update the product's reviews array with the new comment's ID
+    product.reviews.push(newComment);
 
     // Calculate new product rating based on all comments
-    const ratings = await Promise.all(
-      product.comments.map(async (_comment) => {
-        const comment = await Comment.findById(_comment);
-        console.log(comment);
-        return comment.rating;
-      })
-    );
+    const ratings = product.reviews.map((comment) => comment.rating);
 
-    console.log(ratings);
     const totalRating = ratings.reduce((sum, rating) => sum + rating, 0);
-    product.rating = totalRating / product.comments.length;
+    product.rating = totalRating / product.reviews.length;
 
     // Save the updated product
     await product.save();

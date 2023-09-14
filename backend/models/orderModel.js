@@ -31,7 +31,7 @@ const orderSchema = new mongoose.Schema(
     },
     taxAmount: { type: Number, required: true, default: 0, min: 0 },
     shippingCost: { type: Number, required: true, default: 0, min: 0 },
-    refundAmount: Number,
+    refundAmount: { type: Number, min: 0 },
     returnRequested: Boolean,
     returnReason: String,
   },
