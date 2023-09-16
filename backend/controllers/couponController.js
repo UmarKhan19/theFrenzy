@@ -105,6 +105,7 @@ const getAllCoupons = async (req, res) => {
 
     res.status(200).json({
       success: true,
+      totalCoupons: coupons.length,
       coupons,
     });
   } catch (error) {

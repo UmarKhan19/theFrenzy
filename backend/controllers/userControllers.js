@@ -62,7 +62,11 @@ const registerUser = async (req, res) => {
     res
       .status(201)
       .header("Authorization", `Bearer ${token}`)
-      .json({ message: "User registered successfully" });
+      .json({
+        success: true,
+        message: "User registered successfully",
+        token: `Bearer ${token}`,
+      });
   } catch (error) {
     console.error("Error during user registration:", error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -103,7 +107,11 @@ const loginUser = async (req, res) => {
     res
       .status(200)
       .header("Authorization", `Bearer ${token}`)
-      .json({ success: true, message: "Login successfull" });
+      .json({
+        success: true,
+        message: "Login successfull",
+        token: `Bearer ${token}`,
+      });
   } catch (error) {
     res.status(500).json({ error: "An error occurred while logging in" });
   }
