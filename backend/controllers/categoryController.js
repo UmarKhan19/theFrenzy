@@ -174,4 +174,33 @@ const getCategories = async (req, res) => {
   }
 };
 
-module.exports = { addCategory, deleteCategory, updateCategory, getCategories };
+const searchCategory = async (req, res) => {
+  try {
+    const query = req.query.q; // Get the search query from the query parameter
+
+    const categories = await Category.find({
+      $or: [
+        { name: { $regex: query, $options: "i" } }, // Search by product name (case-insensitive)
+        { description: { $regex: query, $options: "i" } }, // Search by product description (case-insensitive)
+      ],
+    });
+
+    if (categories.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No categories found matching the search query" });
+    }
+
+    res.status(200).json({ totalCategories: categories.length, categories });
+  } catch (error) {
+    next(error); // Pass the error to the error handler middleware
+  }
+};
+
+module.exports = {
+  addCategory,
+  deleteCategory,
+  updateCategory,
+  getCategories,
+  searchCategory,
+};

@@ -117,6 +117,28 @@ const getAllCoupons = async (req, res) => {
   }
 };
 
+const searchCoupon = async (req, res) => {
+  try {
+    const query = req.query.q; // Get the search query from the query parameter
+
+    const coupons = await Coupon.find({
+      $or: [
+        { code: { $regex: query, $options: "i" } }, // Search by product name (case-insensitive)
+      ],
+    });
+
+    if (coupons.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No coupons found matching the search query" });
+    }
+
+    res.status(200).json({ totalCoupons: coupons.length, coupons });
+  } catch (error) {
+    next(error); // Pass the error to the error handler middleware
+  }
+};
+
 async function validateProducts(productIds) {
   try {
     const validProducts = await Product.find({ _id: { $in: productIds } });
@@ -154,4 +176,4 @@ async function validateUserRestrictions(userRestrictions) {
   }
 }
 
-module.exports = { addCoupon, deleteCoupon, getAllCoupons };
+module.exports = { addCoupon, deleteCoupon, getAllCoupons, searchCoupon };
