@@ -23,7 +23,7 @@ const addCategory = async (req, res) => {
     }
 
     // Check if the parentCategory exists (if provided)
-    if (parentCategory) {
+    if (parentCategory !== "" && parentCategory) {
       const parentExists = await Category.exists({ _id: parentCategory });
 
       if (!parentExists) {
@@ -153,4 +153,25 @@ const updateCategory = async (req, res) => {
   }
 };
 
-module.exports = { addCategory, deleteCategory, updateCategory };
+const getCategories = async (req, res) => {
+  try {
+    const categories = await Category.find({});
+
+    if (categories.length === 0) {
+      return res
+        .status(404)
+        .json({ success: true, message: "No categories found" });
+    }
+
+    res
+      .status(201)
+      .json({ success: true, totalCategories: categories.length, categories });
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.log(error);
+    }
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+module.exports = { addCategory, deleteCategory, updateCategory, getCategories };
