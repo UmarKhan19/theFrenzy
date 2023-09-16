@@ -141,6 +141,47 @@ const getProfile = async (req, res) => {
   }
 };
 
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({});
+
+    if (users.length === 0) {
+      return res.status(404).json({ success: true, message: "No users found" });
+    }
+
+    res.status(201).json({ success: true, totalUsers: users.length, users });
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.log(error);
+    }
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+const searchUser = async (req, res) => {
+  try {
+    const query = req.query.q; // Get the search query from the query parameter
+
+    const users = await User.find({
+      $or: [
+        { email: { $regex: query, $options: "i" } }, // Search by product name (case-insensitive)
+        { firstName: { $regex: query, $options: "i" } }, // Search by product description (case-insensitive)
+        { lastName: { $regex: query, $options: "i" } }, // Search by product description (case-insensitive)
+      ],
+    });
+
+    if (users.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No users found matching the search query" });
+    }
+
+    res.status(200).json({ totalUsers: users.length, users });
+  } catch (error) {
+    next(error); // Pass the error to the error handler middleware
+  }
+};
+
 // //////////////////////////////////////////////////////////////////
 // Update User Profile
 // //////////////////////////////////////////////////////////////////
@@ -336,4 +377,6 @@ module.exports = {
   deleteUserAccount,
   forgotPassword,
   resetPassword,
+  getAllUsers,
+  searchUser,
 };
