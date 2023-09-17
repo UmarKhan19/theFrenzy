@@ -161,7 +161,7 @@ const CardCarousel = () => {
 
   return (
     <div className="mt-16 pl-3">
-      <h2 className='text-3xl font-medium title-font text-gray-900 mb-4 text-center'>Hot Picks</h2>
+      <h2 className='text-3xl font-medium title-font text-gray-900 mb-4 text-center'>Trending Products</h2>
       <Carousel
         responsive={responsive}
         infinite={true}

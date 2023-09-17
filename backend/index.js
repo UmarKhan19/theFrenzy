@@ -12,7 +12,7 @@ const errorHandler = require("./middleware/errorHandler");
 
 dotenv.config({ path: "./config/.env" });
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT||5000;
 
 connectDB();
 const app = express();
@@ -32,5 +32,5 @@ app.use("/api/coupon", couponRoutes);
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+  console.log(`Server running in ${process.env.NODE_ENV||"mac"} mode on port ${PORT}`);
 });

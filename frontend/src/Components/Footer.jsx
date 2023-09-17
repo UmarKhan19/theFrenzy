@@ -1,5 +1,5 @@
 import React from 'react';
-import Logo from "../../public/images/footer.png";
+import Logo from "/images/footer.png";
 import { AiOutlineInstagram } from "react-icons/ai";
 import { FaTwitter } from "react-icons/fa";
 import { BsFacebook } from "react-icons/bs";
@@ -8,7 +8,7 @@ import { FaCcVisa } from "react-icons/fa";
 
 const Footer = () => {
   return (
-    <footer className='border-2 border-black p-4 bg-gray-700'>
+    <footer className='border-2 border-black p-4 bg-black'>
       {/* Logo and Social Icons */}
       <div className='flex items-start p-4 px-5 justify-between flex-wrap max-sm:gap-8 mb-5'>
         <span className=''>
@@ -25,39 +25,39 @@ const Footer = () => {
         <div className='flex justify-between mt-6 lg:mt-0 gap-20 max-sm:flex-wrap max-sm:gap-10 text-white'>
           <div>
             <h3 className='text-2xl'>Contact Us</h3>
-            <ul className='text-slate-500 mt-3'>
-              <li className='hover:text-red-300 cursor-pointer'>Email Us</li>
-              <li className='hover:text-red-300 cursor-pointer'>Call Us</li>
+            <ul className='mt-3'>
+              <li className='hover:text-gray-500 cursor-pointer'>Email Us</li>
+              <li className='hover:text-gray-500 cursor-pointer'>Call Us</li>
             </ul>
           </div>
 
           {/* Shopping Guide */}
           <div>
             <h3 className='text-2xl'>Shopping Guide</h3>
-            <ul className='text-slate-500 mt-3'>
-              <li className='hover:text-red-300 cursor-pointer'>Order Status</li>
-              <li className='hover:text-red-300 cursor-pointer'>Return</li>
-              <li className='hover:text-red-300 cursor-pointer'>Shipping</li>
-              <li className='hover:text-red-300 cursor-pointer'>Payment</li>
+            <ul className=' mt-3'>
+              <li className='hover:text-gray-500 cursor-pointer'>Order Status</li>
+              <li className='hover:text-gray-500 cursor-pointer'>Return</li>
+              <li className='hover:text-gray-500 cursor-pointer'>Shipping</li>
+              <li className='hover:text-gray-500 cursor-pointer'>Payment</li>
             </ul>
           </div>
 
           {/* Services */}
           <div>
             <h3 className='text-2xl'>Services</h3>
-            <ul className='text-slate-500 mt-3'>
-              <li className='hover:text-red-300 cursor-pointer'>Gift Card</li>
-              <li className='hover:text-red-300 cursor-pointer'>Referral</li>
+            <ul className='mt-3'>
+              <li className='hover:text-gray-500 cursor-pointer'>Gift Card</li>
+              <li className='hover:text-gray-500 cursor-pointer'>Referral</li>
             </ul>
           </div>
 
           {/* Categories */}
           <div>
             <h3 className='text-2xl'>Categories</h3>
-            <ul className='text-slate-500 mt-3'>
-              <li className='hover:text-red-300 cursor-pointer'>Anime</li>
-              <li className='hover:text-red-300 cursor-pointer'>Oversized</li>
-              <li className='hover:text-red-300 cursor-pointer'>Anime</li>
+            <ul className=' mt-3'>
+              <li className='hover:text-gray-500 cursor-pointer'>Anime</li>
+              <li className='hover:text-gray-500 cursor-pointer'>Oversized</li>
+              <li className='hover:text-gray-500 cursor-pointer'>Anime</li>
             </ul>
           </div>
         </div>

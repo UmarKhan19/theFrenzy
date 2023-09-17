@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { AiOutlineHeart } from 'react-icons/ai';
 import Carousel from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
-import { Link } from 'react-router-dom'; // Import Link from React Router
+import { Link } from 'react-router-dom'; 
 
-
+// Sample data for cards
 const cardData = [
   {
     img: "https://assets.bonkerscorner.com/uploads/2023/09/11103633/20230725_060209000_iOS.jpg",
@@ -15,47 +15,48 @@ const cardData = [
     newPrice: "50",
   },
   {
-    img: "https://assets.bonkerscorner.com/uploads/2023/09/11103633/20230725_060209000_iOS.jpg",
-    changeImg: "https://assets.bonkerscorner.com/uploads/2023/05/28155556/Bonkerscorner_Squad-sweats_02.jpg",
-    category: "Nigga Hoddie",
+    img: "https://assets.bonkerscorner.com/uploads/2023/03/20113050/Bonkerscorner_Blue-Good-Vibes_02.jpg",
+    changeImg: "https://assets.bonkerscorner.com/uploads/2023/05/29132836/Bonkerscorner_Ice-Hockey-Jersy-Orange_Sweatshirt_02.jpg",
+    category: "anime Hoddie",
     title:"Black Hoddie",
     prevPrice: "$140,00",
     newPrice: "50",
   },
   {
-    img: "https://assets.bonkerscorner.com/uploads/2023/09/11103633/20230725_060209000_iOS.jpg",
-    changeImg: "https://assets.bonkerscorner.com/uploads/2023/05/28155556/Bonkerscorner_Squad-sweats_02.jpg",
-    category: "Nigga Hoddie",
+    img: "https://assets.bonkerscorner.com/uploads/2023/05/11104856/pika-pika-navy-blue-sweatshirt-9.jpg",
+    changeImg: "https://assets.bonkerscorner.com/uploads/2023/08/10114838/20230809_115850213_iOS.jpg",
+    category: "anime Hoddie",
     title:"Black Hoddie",
     prevPrice: "$140,00",
     newPrice: "50",
   },
   {
-    img: "https://assets.bonkerscorner.com/uploads/2023/09/11103633/20230725_060209000_iOS.jpg",
-    changeImg: "https://assets.bonkerscorner.com/uploads/2023/05/28155556/Bonkerscorner_Squad-sweats_02.jpg",
-    category: "Nigga Hoddie",
+    img: "https://assets.bonkerscorner.com/uploads/2023/08/10114838/20230809_115850213_iOS.jpg",
+    changeImg: "https://assets.bonkerscorner.com/uploads/2023/05/11104856/pika-pika-navy-blue-sweatshirt-9.jpg",
+    category: "anime Hoddie",
     title:"Black Hoddie",
     prevPrice: "$140,00",
     newPrice: "50",
   },
   {
-    img: "https://assets.bonkerscorner.com/uploads/2023/09/11103633/20230725_060209000_iOS.jpg",
-    changeImg: "https://assets.bonkerscorner.com/uploads/2023/05/28155556/Bonkerscorner_Squad-sweats_02.jpg",
-    category: "Nigga Hoddie",
+    img: "https://assets.bonkerscorner.com/uploads/2023/05/29132836/Bonkerscorner_Ice-Hockey-Jersy-Orange_Sweatshirt_02.jpg",
+    changeImg: "https://assets.bonkerscorner.com/uploads/2023/04/29142225/Bonkerscorner_Vegeta_01.jpg",
+    category: "anime Hoddie",
     title:"Black Hoddie",
     prevPrice: "$140,00",
     newPrice: "50",
   },
   {
-    img: "https://assets.bonkerscorner.com/uploads/2023/09/11103633/20230725_060209000_iOS.jpg",
+    img: "https://assets.bonkerscorner.com/uploads/2023/04/29142225/Bonkerscorner_Vegeta_01.jpg",
     changeImg: "https://assets.bonkerscorner.com/uploads/2023/05/28155556/Bonkerscorner_Squad-sweats_02.jpg",
-    category: "Nigga Hoddie",
+    category: "anime Hoddie",
     title:"Black Hoddie",
     prevPrice: "$140,00",
     newPrice: "50",
   },
-  
 ];
+
+// Define sizes for the product
 const sizes = {
   s: 'Small',
   m: 'Medium',
@@ -63,7 +64,8 @@ const sizes = {
   xl: 'Extra Large',
   xxl: 'XX Large',
 };
-// MyCard component for rendering individual product cards
+
+// Component for rendering each card
 const MyCard = ({ cardData }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showSizes, setShowSizes] = useState(false);
@@ -78,7 +80,7 @@ const MyCard = ({ cardData }) => {
     setIsHovered(false);
   };
 
-  // Handle click on "Select Option" button
+  // Handle click to select options
   const handleSelectOptionClick = () => {
     setShowSizes(!showSizes);
   };
@@ -90,16 +92,15 @@ const MyCard = ({ cardData }) => {
 
   return (
     <div
-      className={`relative bg-white w-fit rounded-lg m-5 shadow-md overflow-hidden ${isHovered ? 'hovered' : ''}`}
+      className={`relative rounded-lg  m-5  ${isHovered ? 'hovered' : ''}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      id='products'
     >
-      <Link to="/single-product">
+      <Link to="/single-product"> {/* Add the actual route here */}
         <img
           src={isHovered ? cardData.changeImg : cardData.img}
           alt={cardData.title}
-          className="w-96  max-sm:h-64 cursor-pointer shadow-lg object-cover"
+          className="w-full h-80 max-sm:h-64 cursor-pointer shadow-lg object-cover"
         />
       </Link>
       <div className={`p-4 ${showSizes ? 'filter blur-md' : ''}`}>
@@ -118,6 +119,7 @@ const MyCard = ({ cardData }) => {
           <AiOutlineHeart className="text-xl cursor-pointer" />
         </div>
       </div>
+
       {showSizes && (
         <div className="absolute w-2/3 top-20 left-10 right-0 bg-white max-md:py-2 lg:p-4 border border-black z-10 rounded-md">
           <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-800" onClick={handleCloseSizeCard}>
@@ -139,13 +141,13 @@ const MyCard = ({ cardData }) => {
   );
 };
 
-// CardCarousel component for displaying a carousel of product cards
+// Component for the card carousel
 const CardCarousel = () => {
   const responsive = {
     desktop: {
       breakpoint: { max: 3000, min: 1024 },
       items: 3,
-      slidesToSlide: 1,
+      slidesToSlide: 3,
     },
     tablet: {
       breakpoint: { max: 1024, min: 464 },
@@ -160,13 +162,13 @@ const CardCarousel = () => {
   };
 
   return (
-    <div className="mt-16 pl-3">
-      <h2 className='text-3xl font-medium title-font text-gray-900 mb-4 text-center'>Hot Picks</h2>
+    <div className="mt-2 pl-3">
+      <h2 className='text-3xl font-bold text-red-400'>People's Choice</h2>
       <Carousel
         responsive={responsive}
         infinite={true}
         containerClass="carousel-container"
-        removeArrowOnDeviceType={['mobile']}
+        removeArrowOnDeviceType={['tablet', 'mobile']}
         itemClass="carousel-item"
         customButtonGroup={
           <div className="custom-button-group">
