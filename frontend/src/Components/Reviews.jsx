@@ -50,7 +50,7 @@ const Reviews = () => {
               <AiOutlineStar />
             </div>
             <div className="flex mb-3">
-              <h3 className="font-bold">SHIVANSH Chutiya</h3>
+              <h3 className="font-bold">SHIVANSH</h3>
               <span className="text-slate-500">- JULY 27, 2023</span>
             </div>
             <div>
@@ -112,7 +112,7 @@ const Reviews = () => {
                 required
               ></textarea>
             </div>
-            <div className="text-left">
+            <div className="text-left mb-2">
               <button
                 type="submit"
                 className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 focus:outline-none"

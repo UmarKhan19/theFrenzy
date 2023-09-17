@@ -1,6 +1,7 @@
 import Nav from '../../Components/Nav';
 import HeroSingle from '../../Components/HeroSingle';
 import SingleCard from "../../Components/SingleCard";
+import SingleCard2 from "../../Components/SingleCard2";
 import Footer from "../../Components/Footer";
 import Reviews from '../../Components/Reviews';
 
@@ -13,6 +14,9 @@ const SingleProduct = () => {
       </div>
       <div>
         <SingleCard/>
+      </div>
+      <div>
+        <SingleCard2/>
       </div>
       <div>
         <Reviews/>
