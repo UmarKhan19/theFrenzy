@@ -13,6 +13,7 @@ const {
   addReview,
   deleteComment,
   getHotProducts,
+  getReviews,
 } = require("../controllers/productController");
 const authMiddleware = require("../middleware/authMiddleware");
 const checkAdmin = require("../middleware/isAdmin");
@@ -25,20 +26,11 @@ router.get("/search", searchProduct);
 router.get("/", filterAndSort);
 router.get("/hot-products", getHotProducts);
 router.get("/:id", getSingleProduct);
+router.get("/reviews/:productId", getReviews);
 router.put("/:id", authMiddleware, checkAdmin, updateProduct);
 router.delete("/:id", authMiddleware, checkAdmin, deleteProduct);
-router.put(
-  "/:productId/:variantId/update",
-  authMiddleware,
-  checkAdmin,
-  updateVariant
-);
-router.delete(
-  "/:productId/:variantId/delete",
-  authMiddleware,
-  checkAdmin,
-  deleteVariant
-);
+router.put("/:variantId/update", authMiddleware, checkAdmin, updateVariant);
+router.delete("/:variantId/delete", authMiddleware, checkAdmin, deleteVariant);
 router.post("/:productId/add-variant", authMiddleware, checkAdmin, addVariant);
 
 router.post("/:productId/reviews", authMiddleware, addReview);

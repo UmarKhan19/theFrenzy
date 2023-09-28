@@ -7,7 +7,7 @@ const orderSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    orderDate: { type: Date, required: true },
+    coupon: { type: mongoose.Schema.Types.ObjectId, ref: "Coupon" },
     totalAmount: { type: Number, required: true, min: 0 },
     orderItems: [
       {
@@ -17,7 +17,7 @@ const orderSchema = new mongoose.Schema(
       },
     ],
     address: {
-      houseNumber: { type: String, required: true, trim: true },
+      streetAddress: { type: String, required: true, trim: true },
       city: { type: String, required: true, trim: true },
       state: { type: String, required: true, trim: true },
       country: { type: String, required: true, trim: true },
@@ -29,6 +29,7 @@ const orderSchema = new mongoose.Schema(
       default: "pending",
       required: true,
     },
+    phoneNumber: { type: Number, required: true },
     taxAmount: { type: Number, required: true, default: 0, min: 0 },
     shippingCost: { type: Number, required: true, default: 0, min: 0 },
     refundAmount: { type: Number, min: 0 },
