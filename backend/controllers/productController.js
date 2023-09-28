@@ -1,6 +1,7 @@
 const Comment = require("../models/reviewModel");
 const Product = require("../models/productModel");
 const Category = require("../models/categoryModel");
+const productVariant = require("../models/productVariantModel");
 const cloudinary = require("cloudinary").v2;
 
 cloudinary.config({
@@ -15,7 +16,7 @@ cloudinary.config({
 
 const createProduct = async (req, res) => {
   try {
-    const { name, description, categories, price, discount } = req.body;
+    const { name, description, categories } = req.body;
 
     if (!name) {
       return res
@@ -25,24 +26,19 @@ const createProduct = async (req, res) => {
 
     // Use a single query to find all categories by their IDs
     const productCategories = await Category.find({ _id: { $in: categories } });
-
-    if (!productCategories.length) {
-      return res.status(400).json({
-        success: false,
-        message: "One or more categories do not exist",
-      });
+    if (categories) {
+      if (productCategories.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "One or more categories do not exist",
+        });
+      }
     }
-
-    const totalPrice = price - (price * discount) / 100;
 
     const newProduct = new Product({
       name,
       description,
       category: productCategories,
-      price,
-      discount,
-      totalPrice,
-      reviews: [],
     });
 
     const savedProduct = await newProduct.save();
@@ -67,10 +63,9 @@ const createProduct = async (req, res) => {
 const addVariant = async (req, res) => {
   try {
     const { productId } = req.params;
-    const { size, color, stock } = req.body;
+    const { size, color, stock, price, discount } = req.body;
     const { images } = req.files;
 
-    // Step 1: Upload new images to Cloudinary
     const uploadedImageUrls = await Promise.all(
       images.map(async (url) => {
         const uploadedImage = await cloudinary.uploader.upload(
@@ -79,21 +74,28 @@ const addVariant = async (req, res) => {
         return uploadedImage.secure_url;
       })
     );
+    const totalPrice = price - (discount * price) / 100;
 
-    // Step 2: Find the product by ID and push the new variant
+    const variant = new productVariant({
+      size,
+      color,
+      stock,
+      price,
+      discount,
+      totalPrice,
+      images: uploadedImageUrls,
+      product: productId,
+    });
+
+    await variant.save();
+
     const updatedProduct = await Product.findOneAndUpdate(
       { _id: productId },
       {
         $push: {
-          variants: {
-            size,
-            color,
-            stock,
-            images: uploadedImageUrls,
-          },
+          variants: variant._id,
         },
-      },
-      { new: true }
+      }
     );
 
     if (!updatedProduct) {
@@ -109,7 +111,6 @@ const addVariant = async (req, res) => {
     res.status(201).json({
       success: true,
       message: "Variant added successfully",
-      product: updatedProduct,
     });
   } catch (error) {
     if (process.env.NODE_ENV !== "production") console.error(error);
@@ -134,14 +135,23 @@ const deleteProduct = async (req, res) => {
     }
 
     // Delete associated images from Cloudinary
-    const deletedImageUrls = deletedProduct.variants.flatMap(
-      (variant) => variant.images
-    );
+    const deletedImageUrls = [];
 
-    for (const imageUrl of deletedImageUrls) {
-      const publicId = imageUrl.split("/").pop().split(".")[0];
-      await cloudinary.uploader.destroy(publicId);
+    for (variant of deletedProduct.variants) {
+      const variants = await productVariant.findById(variant);
+      variants.images.map((imgUrl) => deletedImageUrls.push(imgUrl));
     }
+
+    if (deletedImageUrls.length !== 0) {
+      for (const images of deletedImageUrls) {
+        const publicId = images?.split("/").pop().split(".")[0];
+        await cloudinary.uploader.destroy(publicId);
+      }
+    }
+
+    deletedProduct.variants?.forEach(async (variant) => {
+      await productVariant.findByIdAndDelete(variant);
+    });
 
     res.status(200).json({
       success: true,
@@ -165,7 +175,10 @@ const getAllProducts = async (req, res, next) => {
     const totalProducts = await Product.countDocuments();
     const totalPages = Math.ceil(totalProducts / perPage);
 
-    const products = await Product.find({})
+    const products = await Product.find({ variants: { $not: { $size: 0 } } })
+      .populate("variants")
+      .populate("category")
+      .populate({ path: "category", populate: "parentCategory" })
       .skip((page - 1) * perPage)
       .limit(perPage);
 
@@ -192,7 +205,10 @@ const getSingleProduct = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const product = await Product.findById(id);
+    const product = await Product.findById(id)
+      .populate("variants")
+      .populate("category")
+      .populate({ populate: "parentCategory", path: "category" });
 
     if (!product) {
       return res
@@ -217,19 +233,24 @@ const getSingleProduct = async (req, res) => {
 
 const updateProduct = async (req, res, next) => {
   const { id } = req.params;
-  const { name, description, price, category, discount } = req.body;
+  const { name, description, categories } = req.body;
 
   try {
     const productUpdate = {
       description,
       name,
-      price,
-      category,
-      discount,
     };
 
-    const totalPrice = price - (price * discount) / 100;
-    productUpdate.totalPrice = totalPrice;
+    const productCategories = await Category.find({ _id: { $in: categories } });
+    if (categories) {
+      if (!productCategories.length) {
+        return res.status(400).json({
+          success: false,
+          message: "One or more categories do not exist",
+        });
+      }
+      productUpdate.category = productCategories;
+    }
 
     const updatedProduct = await Product.findByIdAndUpdate(id, productUpdate, {
       new: true,
@@ -258,13 +279,22 @@ const updateProduct = async (req, res, next) => {
 
 const updateVariant = async (req, res) => {
   try {
-    const { productId, variantId } = req.params;
-    const { size, color, stock } = req.body;
-    const { images } = req.files;
+    const { variantId } = req.params;
+    const { size, color, stock, price, discount } = req.body;
 
-    // Step 1: Make a copy of the original variant's image URLs
-    const originalProduct = await Product.findById(productId);
-    const originalVariant = originalProduct.variants.id(variantId);
+    let images = [];
+    if (req.files && req.files.images) {
+      const imageFiles = req.files.images;
+
+      if (imageFiles.length === undefined) {
+        images.push(imageFiles);
+      } else {
+        for (const image of imageFiles) {
+          images.push(image);
+        }
+      }
+    }
+    const originalVariant = await productVariant.findById(variantId);
 
     if (!originalVariant) {
       return res
@@ -272,53 +302,49 @@ const updateVariant = async (req, res) => {
         .json({ success: false, message: "Variant not found" });
     }
 
-    const originalImageUrls = originalVariant.imageUrls.slice();
+    const originalImageUrls = originalVariant.images.slice();
 
-    // Step 2: Update the product data without modifying the variant images
-    const productUpdate = {
-      "variants.$.size": size || originalVariant.size,
-      "variants.$.color": color || originalVariant.color,
-      "variants.$.stock": stock || originalVariant.stock,
-    };
+    originalVariant.size = size || originalVariant.size;
+    originalVariant.stock = stock || originalVariant.stock;
+    originalVariant.color = color || originalVariant.color;
+    originalVariant.price = price || originalVariant.price;
+    originalVariant.discount = discount || originalVariant.discount;
 
-    // Step 3: Upload new images to Cloudinary
-    const uploadedImageUrls = await Promise.all(
-      images.map(async (url) => {
-        const uploadedImage = await cloudinary.uploader.upload(
-          url.tempFilePath
-        );
-        return uploadedImage.secure_url;
-      })
-    );
+    originalVariant.totalPrice = price - (discount * price) / 100;
 
-    // Step 4: Update the product with new image URLs
-    const imageUpdate = {
-      "variants.$.images": uploadedImageUrls,
-    };
-    await Product.findOneAndUpdate(
-      { _id: productId, "variants._id": variantId },
-      { $set: imageUpdate, $inc: { __v: 1 } }, // Increment __v to trigger update
-      {
-        new: true,
+    originalVariant.save();
+    if (images.length !== 0) {
+      const uploadedImageUrls = await Promise.all(
+        images.map(async (url) => {
+          const uploadedImage = await cloudinary.uploader.upload(
+            url.tempFilePath
+          );
+          return uploadedImage.secure_url;
+        })
+      );
+
+      originalVariant.images = uploadedImageUrls;
+
+      originalVariant.save();
+    }
+
+    if (images.length !== 0) {
+      try {
+        for (const imageUrl of originalImageUrls) {
+          // Extract public ID from image URL
+          const publicId = imageUrl.split("/").pop().split(".")[0];
+          // Delete image from Cloudinary using the public ID
+          await cloudinary.uploader.destroy(publicId);
+        }
+      } catch (error) {
+        // Revert back to original image URLs
+        originalVariant.images = originalImageUrls;
+        await originalProduct.save();
+        return res.status(500).json({
+          success: false,
+          message: "Failed to delete previous images from Cloudinary",
+        });
       }
-    );
-
-    // Step 5: Delete previous images from Cloudinary
-    try {
-      for (const imageUrl of originalImageUrls) {
-        // Extract public ID from image URL
-        const publicId = imageUrl.split("/").pop().split(".")[0];
-        // Delete image from Cloudinary using the public ID
-        await cloudinary.uploader.destroy(publicId);
-      }
-    } catch (error) {
-      // Revert back to original image URLs
-      originalVariant.imageUrls = originalImageUrls;
-      await originalProduct.save();
-      return res.status(500).json({
-        success: false,
-        message: "Failed to delete previous images from Cloudinary",
-      });
     }
 
     res
@@ -337,16 +363,9 @@ const updateVariant = async (req, res) => {
 
 const deleteVariant = async (req, res) => {
   try {
-    const { productId, variantId } = req.params;
+    const { variantId } = req.params;
 
-    const product = await Product.findById(productId);
-    if (!product) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Product not found" });
-    }
-
-    const variantToDelete = product.variants.id(variantId);
+    const variantToDelete = await productVariant.findOne({ _id: variantId });
     if (!variantToDelete) {
       return res
         .status(404)
@@ -367,11 +386,17 @@ const deleteVariant = async (req, res) => {
     }
 
     // Remove the variant from the array and save the product
-    await Product.findByIdAndDelete(variantToDelete._id);
 
+    await Product.findOneAndUpdate(
+      { variants: variantId },
+      { $pull: { variants: variantId } },
+      { new: true }
+    );
+
+    await productVariant.findOneAndDelete({ _id: variantId });
     res.status(200).json({
       success: true,
-      message: "Variant and images deleted successfully",
+      message: "Variant deleted successfully",
     });
   } catch (error) {
     console.error(error);
@@ -392,7 +417,10 @@ const searchProduct = async (req, res, next) => {
         { name: { $regex: query, $options: "i" } }, // Search by product name (case-insensitive)
         { description: { $regex: query, $options: "i" } }, // Search by product description (case-insensitive)
       ],
-    });
+    })
+      .populate("variants")
+      .populate("category")
+      .populate({ populate: "parentCategory", path: "category" });
 
     if (products.length === 0) {
       return res
@@ -435,10 +463,10 @@ const filterAndSort = async (req, res, next) => {
       filter["variants.size"] = size;
     }
     if (minPrice && maxPrice) {
-      filter.originalPrice = { $gte: minPrice, $lte: maxPrice };
+      filter.price = { $gte: minPrice, $lte: maxPrice };
     }
     if (minDiscount && maxDiscount) {
-      filter.discountPercent = { $gte: minDiscount, $lte: maxDiscount };
+      filter.discount = { $gte: minDiscount, $lte: maxDiscount };
     }
 
     const sortOptions = {};
@@ -446,31 +474,19 @@ const filterAndSort = async (req, res, next) => {
       sortOptions[sortBy] = sortOrder === "desc" ? -1 : 1;
     }
 
-    const products = await Product.find(filter).sort(sortOptions);
+    const products = await Product.find(filter)
+      .sort(sortOptions)
+      .populate("variants")
+      .populate("category")
+      .populate({ path: "category", populate: "parentCategory" });
 
     if (products.length === 0) {
       return res.status(404).json({ message: "No products found" });
     }
 
-    const productsWithTotalPrice = products.map((product) => {
-      const { _id, name, description, originalPrice, discountPercent } =
-        product;
-      const totalPrice =
-        originalPrice - (originalPrice * discountPercent) / 100;
-
-      return {
-        _id,
-        name,
-        description,
-        originalPrice,
-        discountPercent,
-        totalPrice,
-      };
-    });
-
     res.status(200).json({
-      totalProducts: productsWithTotalPrice.length,
-      products: productsWithTotalPrice,
+      totalProducts: products.length,
+      products: products,
     });
   } catch (error) {
     next(error);
@@ -555,6 +571,24 @@ const addReview = async (req, res) => {
 };
 
 // //////////////////////////////////////////////////////////////////
+// Get Reviews of Products
+// //////////////////////////////////////////////////////////////////
+
+const getReviews = async (req, res) => {
+  const { productId } = req.params;
+
+  const reviews = await Comment.find({ product: productId });
+
+  if (reviews.length === 0) {
+    return res.status(404).json({ success: false, message: "No reviews" });
+  }
+
+  res
+    .status(200)
+    .json({ success: true, totalReviews: reviews.length, reviews });
+};
+
+// //////////////////////////////////////////////////////////////////
 // Delete Reviews on Products
 // //////////////////////////////////////////////////////////////////
 
@@ -582,8 +616,8 @@ const deleteComment = async (req, res) => {
 
     // Remove the comment reference from the product's comments array
     const product = await Product.findOneAndUpdate(
-      { comments: commentId },
-      { $pull: { comments: commentId } },
+      { reviews: commentId },
+      { $pull: { reviews: commentId } },
       { new: true }
     );
 
@@ -592,7 +626,7 @@ const deleteComment = async (req, res) => {
 
     // Update the product's rating based on remaining comments
     const remainingComments = await Comment.find({
-      _id: { $in: product.comments },
+      _id: { $in: product.reviews },
     });
 
     if (remainingComments.length === 0) {
@@ -620,7 +654,10 @@ const deleteComment = async (req, res) => {
 
 const getHotProducts = async (req, res) => {
   try {
-    const products = await Product.find({});
+    const products = await Product.find({})
+      .populate("variants")
+      .populate("category")
+      .populate({ populate: "parentCategory", path: "category" });
 
     // Calculate hotnessScore for each product
     const hotProducts = products.map((product) => {
@@ -670,6 +707,7 @@ module.exports = {
   deleteProduct,
   deleteVariant,
   addReview,
+  getReviews,
   deleteComment,
   getHotProducts,
 };
