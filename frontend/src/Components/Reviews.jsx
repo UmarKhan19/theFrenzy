@@ -7,6 +7,8 @@ const Reviews = () => {
   const [reviewText, setReviewText] = useState('');
   const [name, setName] = useState('');
 
+  
+
   // Handle change for the review text input
   const handleReviewChange = (e) => {
     setReviewText(e.target.value);
