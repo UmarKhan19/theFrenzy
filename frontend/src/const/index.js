@@ -3,14 +3,14 @@ export const navLinks = [
     { href: "#products", label: "Popular" },
     { href: "#about-us", label: "About Us" },
     { href: "#contact-us", label: "Contact Us" },
-    { href: "#Categories", label: "Products" },
+    { href: "Product", label: "Products" },
 ];
 export const navbarLinks = [
     { href: "#home", label: "Home" },
     { href: "#products", label: "Popular" },
     { href: "#about-us", label: "About Us" },
     { href: "#contact-us", label: "Contact Us" },
-    { href: "#Categories", label: "Products" },
+    { href: "Product", label: "Products" },
 ];
 
 export const Images = [

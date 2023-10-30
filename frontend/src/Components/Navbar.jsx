@@ -5,10 +5,13 @@ import { PiShoppingBag } from 'react-icons/pi';
 import { HiMenu } from 'react-icons/hi';
 import logo from '/images/logo1.png';
 import { Link } from 'react-router-dom';
+import {useSelector} from "react-redux";
 
 // import { Link } from 'react-scroll';
 
 const Navbar = () => {
+
+  const items = useSelector((state)=>state.cart);
   // State to manage the mobile menu open/close
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -29,7 +32,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center gap-6">
           <HiMenu className="md:hidden cursor-pointer" onClick={toggleMenu} />
           <h1 className="text-xl sm:text-sm max-lg">
-            <img className="max-lg:w-[60px]" src={logo} alt="" />
+            <img className="max-lg:w-[60px]" src={logo} alt="logo" />
           </h1>
         </div>
 

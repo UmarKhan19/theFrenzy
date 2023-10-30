@@ -9,7 +9,7 @@ import { AiOutlineFieldTime } from "react-icons/ai";
 const HomeFollow = () => {
   return (
     <div className='w-full '>
-      <div className='flex items-center justify-center gap-4 mt-6 mb-20'>
+      <div className='flex items-center justify-center gap-4 mt-6'>
         <h2 className='text-3xl max-sm:text-xl font-bold'>Follow Us</h2>
         <div className='w-10 bg-black h-1'></div>
         <div className='flex justify-between items-center gap-6 text-black'>

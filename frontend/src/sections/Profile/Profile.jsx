@@ -1,23 +1,26 @@
+// Profile.jsx
+import React from 'react';
+// import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Navbar from '../../Components/Nav';
 import Footer from '../../Components/Footer';
-import ChangePassword from "../../Components/ChangePassword";
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-
-import React from 'react';
 import ProfileSidebar from '../../Components/ProfileSidebar';
 import ProfileArea from '../../Components/ProfileArea';
+// import ChangePassword from '../../Components/ChangePassword';
 
-const Profile = () => {
+
+const Profile= () => {
+
+
   return (
-    <div>
-      <Navbar />
-      <div className="container mx-auto flex">
+      <div>
+        <Navbar />
+        <div className="container mx-auto flex">
         <ProfileSidebar />
-        <ProfileArea />
-      <ChangePassword />
+      <ProfileArea/>
+          {/* <ChangePassword /> */}
+        </div>
+        <Footer />
       </div>
-      <Footer />
-    </div>
   );
 }
 

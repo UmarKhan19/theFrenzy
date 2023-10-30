@@ -35,7 +35,7 @@ const ProfileArea = () => {
 
   return (
     <div className='flex-1 px-5 mb-2'>
-      <h3>Edit Profile</h3>
+      <h3>Profile</h3>
       <div className='border-2 mt-5 px-10 py-10'>
         <p>Email Id</p>
         <input
@@ -66,47 +66,6 @@ const ProfileArea = () => {
                 className={`border-2 rounded-lg mt-3 p-2 text-black w-full ${isEditing ? 'bg-white' : 'bg-gray-100'}`}
                 disabled={!isEditing}
               />
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold mb-2 mt-3">Select Your Gender:</h2>
-              <div className="flex space-x-4">
-                <label>
-                  <input
-                    type="radio"
-                    name="gender"
-                    value="male"
-                    checked={selectedGender === 'male'}
-                    onChange={handleGenderChange}
-                    className="mr-2"
-                    disabled={!isEditing}
-                  />
-                  Male
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    name="gender"
-                    value="female"
-                    checked={selectedGender === 'female'}
-                    onChange={handleGenderChange}
-                    className="mr-2"
-                    disabled={!isEditing}
-                  />
-                  Female
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    name="gender"
-                    value="other"
-                    checked={selectedGender === 'other'}
-                    onChange={handleGenderChange}
-                    className="mr-2"
-                    disabled={!isEditing}
-                  />
-                  Other
-                </label>
-              </div>
             </div>
           </div>
 
