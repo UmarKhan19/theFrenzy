@@ -50,7 +50,7 @@ const Navbar = () => {
               {navLinks.map((item) => (
                 <li key={item.label}>
                   {/* Conditional rendering of links */}
-                  {item.label === 'Home' || item.label === 'Popular' || item.label === 'About Us' || item.label === 'Contact Us' ? (
+                  {item.label === 'Home' || item.label === 'Popular' || item.label === 'About Us' || item.label === 'Contact Us'? (
                     <NavLink
                       to="/" // Provide the correct route path for your home page
                       className="font-montserrat leading-normal text-lg text-slate-gray hover:text-blue-500"
@@ -85,7 +85,7 @@ const Navbar = () => {
                 </NavLink>
               ) : (
                 <NavLink
-                  to={item.href}
+                  to="/Product"
                   className="font-montserrat leading-normal text-lg text-slate-gray hover:text-blue-500"
                 >
                   {item.label}

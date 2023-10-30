@@ -4,9 +4,11 @@ import CartCard from '../../Components/CartCard';
 import Nav from '../../Components/Nav';
 import Footer from "../../Components/Footer";
 import { PiShoppingBag } from 'react-icons/pi';
+// import { UseSelector, useSelector } from 'react-redux/es/hooks/useSelector';
 
 
 const Cart = () => {
+  // const products = useSelector(state=>state.cart);
   return (
     <div>
       <Nav/>
