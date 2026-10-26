@@ -9,7 +9,7 @@ const cardData = [
   {
     img: "https://assets.bonkerscorner.com/uploads/2023/09/11103633/20230725_060209000_iOS.jpg",
     changeImg: "https://assets.bonkerscorner.com/uploads/2023/05/28155556/Bonkerscorner_Squad-sweats_02.jpg",
-    category: "Nigga Hoddie",
+    category: "Category",
     title: "Product 1",
     prevPrice: "$140,00",
     newPrice: "50",
@@ -17,7 +17,7 @@ const cardData = [
   {
     img: "https://assets.bonkerscorner.com/uploads/2023/03/20113050/Bonkerscorner_Blue-Good-Vibes_02.jpg",
     changeImg: "https://assets.bonkerscorner.com/uploads/2023/05/29132836/Bonkerscorner_Ice-Hockey-Jersy-Orange_Sweatshirt_02.jpg",
-    category: "anime Hoddie",
+    category: "Category",
     title: "Product 2",
     prevPrice: "$140,00",
     newPrice: "50",
@@ -25,7 +25,7 @@ const cardData = [
   {
     img: "https://assets.bonkerscorner.com/uploads/2023/05/11104856/pika-pika-navy-blue-sweatshirt-9.jpg",
     changeImg: "https://assets.bonkerscorner.com/uploads/2023/08/10114838/20230809_115850213_iOS.jpg",
-    category: "anime Hoddie",
+    category: "Category",
     title: "Product 3",
     prevPrice: "$140,00",
     newPrice: "50",
@@ -33,7 +33,7 @@ const cardData = [
   {
     img: "https://assets.bonkerscorner.com/uploads/2023/08/10114838/20230809_115850213_iOS.jpg",
     changeImg: "https://assets.bonkerscorner.com/uploads/2023/05/11104856/pika-pika-navy-blue-sweatshirt-9.jpg",
-    category: "anime Hoddie",
+    category: "Category",
     title: "Product 4",
     prevPrice: "$140,00",
     newPrice: "50",
@@ -41,7 +41,7 @@ const cardData = [
   {
     img: "https://assets.bonkerscorner.com/uploads/2023/05/29132836/Bonkerscorner_Ice-Hockey-Jersy-Orange_Sweatshirt_02.jpg",
     changeImg: "https://assets.bonkerscorner.com/uploads/2023/04/29142225/Bonkerscorner_Vegeta_01.jpg",
-    category: "anime Hoddie",
+    category: "Category",
     title: "Product 5",
     prevPrice: "$140,00",
     newPrice: "50",
@@ -49,7 +49,7 @@ const cardData = [
   {
     img: "https://assets.bonkerscorner.com/uploads/2023/04/29142225/Bonkerscorner_Vegeta_01.jpg",
     changeImg: "https://assets.bonkerscorner.com/uploads/2023/05/28155556/Bonkerscorner_Squad-sweats_02.jpg",
-    category: "anime Hoddie",
+    category: "Category",
     title: "Product 6",
     prevPrice: "$140,00",
     newPrice: "50",
